@@ -32,6 +32,33 @@ void ChatWithServer(int clientSocket)
        
     } 
 } 
+char client_ser[2000];
+void *rev(void *arg) 
+{
+  int newSocket = *((int *)arg);
+ // recv(newSocket, client_message, 2000, 0);
+ // printf("%s\n", client_message);
+ // pthread_mutex_lock(&lock);
+  
+   for (;;) {
+    //recv(newSocket, client_ser, 2000, 0);
+    read(newSocket, client_ser, sizeof(client_ser));
+    printf("%s\n", client_ser);
+   // send(newSocket, client_message, strlen(client_message), 0);
+   // if ((strncmp(client_ser, "exit", 4)) == 0 ||(strncmp(client_message, "", 4)) == 0) {
+   //   printf("Client  exit...\n");// inet_ntoa(address.sin_addr));
+   //   break;
+    
+   // }
+    }
+ // while ((buffer[n++] = getchar()) != '\n')
+ // pthread_mutex_unlock(&lock);
+//  sleep(1);
+ // send(newSocket, buffer, strlen(buffer), 0);
+ // printf("Exit socketThread \n");
+  close(newSocket);
+  pthread_exit(NULL);
+}
 int main() {
   int clientSocket;
   struct sockaddr_in serverAddr;
@@ -42,7 +69,7 @@ int main() {
 
   serverAddr.sin_family = AF_INET;
 
-  serverAddr.sin_port = htons(7473);
+  serverAddr.sin_port = htons(7799);
 
   serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
   memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
@@ -50,5 +77,8 @@ int main() {
   addr_size = sizeof serverAddr;
   connect(clientSocket, (struct sockaddr *)&serverAddr, addr_size);
   ChatWithServer(clientSocket);
+  pthread_t rev_t;
+  pthread_create(&rev_t,NULL,rev,&clientSocket);
+  pthread_join(rev_t,NULL);
   close(clientSocket);
 }
