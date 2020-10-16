@@ -12,6 +12,7 @@
 #define MAX 1024
 void ChatWithServer(int clientSocket) 
 { 
+  //int clientSocket=*((int *)arg);
     char buffC[MAX]; 
     char buffS[MAX]; 
     int n; 
@@ -35,27 +36,19 @@ void ChatWithServer(int clientSocket)
 char client_ser[2000];
 void *rev(void *arg) 
 {
+  int rev_size;
   int newSocket = *((int *)arg);
- // recv(newSocket, client_message, 2000, 0);
- // printf("%s\n", client_message);
- // pthread_mutex_lock(&lock);
-  
-   for (;;) {
-    //recv(newSocket, client_ser, 2000, 0);
-    read(newSocket, client_ser, sizeof(client_ser));
-    printf("%s\n", client_ser);
-   // send(newSocket, client_message, strlen(client_message), 0);
-   // if ((strncmp(client_ser, "exit", 4)) == 0 ||(strncmp(client_message, "", 4)) == 0) {
-   //   printf("Client  exit...\n");// inet_ntoa(address.sin_addr));
-   //   break;
+  for(;;)
+  {
+  rev_size= read(newSocket, client_ser, sizeof(client_ser));
+  printf("%s\n", client_ser);
+    if ((strncmp(client_ser, "exit", 4)) == 0  || (rev_size == 0) )
+    {
+      printf("Client  exit...\n");// inet_ntoa(address.sin_addr));
+      break;
     
-   // }
     }
- // while ((buffer[n++] = getchar()) != '\n')
- // pthread_mutex_unlock(&lock);
-//  sleep(1);
- // send(newSocket, buffer, strlen(buffer), 0);
- // printf("Exit socketThread \n");
+  }
   close(newSocket);
   pthread_exit(NULL);
 }
@@ -80,5 +73,7 @@ int main() {
   pthread_t rev_t;
   pthread_create(&rev_t,NULL,rev,&clientSocket);
   pthread_join(rev_t,NULL);
+  
+ 
   close(clientSocket);
 }

@@ -18,7 +18,6 @@
 #include <unistd.h>
 
 char client_message[2000];
-//char buffer[1024] = "Message from server";
 char buffer[1024];
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 void *SocketThread(void *arg) 
@@ -28,11 +27,12 @@ void *SocketThread(void *arg)
  // printf("%s\n", client_message);
  // pthread_mutex_lock(&lock);
   int n=0;
+  int rev_size;
    for (;;) {
-    recv(newSocket, client_message, 2000, 0);
-    printf("%s\n", client_message);
+    rev_size=recv(newSocket, client_message, 2000, 0);
+    printf("%s", client_message);
     send(newSocket, client_message, strlen(client_message), 0);
-    if ((strncmp(client_message, "exit", 4)) == 0 )//||(strncmp(client_message, "", 4)) == 0) 
+    if ((strncmp(client_message, "exit", 4)) == 0 || rev_size == 0) 
     {
       printf("Client  exit...\n");// inet_ntoa(address.sin_addr));
       break;
@@ -42,7 +42,7 @@ void *SocketThread(void *arg)
  // while ((buffer[n++] = getchar()) != '\n')
  // pthread_mutex_unlock(&lock);
 //  sleep(1);
- // send(newSocket, buffer, strlen(buffer), 0);
+ //  send(newSocket, buffer, strlen(buffer), 0);
  // printf("Exit socketThread \n");
   close(newSocket);
   pthread_exit(NULL);
@@ -92,6 +92,7 @@ int main()
     newSocket = accept(serverSocket, (struct sockaddr *)&serverStorage, &addr_size);
 	 
     pthread_create(&tid[i++], NULL, SocketThread, &newSocket);
+    
     if (i >= 3) 
      {
        i = 0;
@@ -102,6 +103,7 @@ int main()
        i = 0;
       }
     }
+    send(newSocket, client_message, strlen(client_message), 0);
   return 0;
  // }
 }
